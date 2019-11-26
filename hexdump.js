@@ -44,6 +44,10 @@ const color = new Colors();
 const args = process.argv.slice(2);
 const filename = args[0];
 
+if (filename === undefined || fs.lstatSync(filename).isDirectory()) {
+  return;
+}
+
 const hexColorMap = {
   control: ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '0a', '0b', '0c', '0d', '0e', '0f', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '1a', '1b', '1c', '1d', '1e', '1f', '7f'],
   letter: ['41', '42', '43', '44', '45', '46', '47', '48', '49', '4a', '4b', '4c', '4d', '4e', '4f', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '5a', '61', '62', '63', '64', '65', '66', '67', '68', '69', '6a', '6b', '6c', '6d', '6e', '6f', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79', '7a'],
@@ -130,11 +134,10 @@ const paintValue = (val, col) => {
   }
 }
 
-// start - skip
-// end - length
-
 const lengthAndSkipArgs = parseArgsFlags(args);
 const { n, s } = lengthSkipArgs(lengthAndSkipArgs);
+// start - skip.
+// end - length.
 const readStreamOption = { highWaterMark: 16, start: s, end: n };
 
 const readFileStream = fs.createReadStream(filename, readStreamOption);
@@ -142,8 +145,8 @@ let offset = s || 0;
 
 const hexdump = (buffer) => {
   for (let i = 0; i < buffer.length; i += 16) {
-    let address = offset.toString(16).padStart(8, '0'); // address
-    let block = buffer.slice(i, i + 16); // cut buffer into blocks of 16
+    let address = offset.toString(16).padStart(8, '0'); // offset address.
+    let block = buffer.slice(i, i + 16); // cut buffer into blocks of 16.
     let hexArray = [];
     let asciiArray = [];
     let padding = '';
@@ -157,10 +160,10 @@ const hexdump = (buffer) => {
       asciiArray.push(paintValue(ascii, color));
     }
 
-    // if block is less than 16 bytes, calculate remaining space
+    // if block is less than 16 bytes -> calculate remaining space.
     if (hexArray.length < 16) {
       let space = 16 - hexArray.length;
-      padding = ' '.repeat(space * 2 + space + (hexArray.length < 9 ? 1 : 0)); // calculate extra space if 8 or less
+      padding = ' '.repeat(space * 2 + space + (hexArray.length < 9 ? 1 : 0)); // calculate extra space if 8 or less.
     }
 
     let hexString = hexArray.length > 8 ? hexArray.slice(0, 8).join(' ') + '  ' + hexArray.slice(8).join(' ') : hexArray.join(' ');
