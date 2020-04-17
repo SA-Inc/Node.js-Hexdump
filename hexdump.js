@@ -44,7 +44,16 @@ const color = new Colors();
 const args = process.argv.slice(2);
 const filename = args[0];
 
-if (filename === undefined || fs.lstatSync(filename).isDirectory()) {
+if (filename === undefined) {
+  console.log(`Usage: node hexdump.js file [-n] [-s]
+    -n number - get N bytes number
+    -s number - skip N bytes`);
+    return;
+} else if (!fs.existsSync(filename)) {
+  console.log(`No such file: ${filename}`)
+  return;
+} else if (fs.lstatSync(filename).isDirectory()) {
+  console.log(`${filename} is a Directory`)
   return;
 }
 
